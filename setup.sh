@@ -36,6 +36,7 @@ git_config() {
 package_install terminus-font
 setfont ter-132b
 package_install networkmanager
+nmtui
 package_install vim
 package_install openssh
 package_install git
