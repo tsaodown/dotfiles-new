@@ -25,7 +25,7 @@ run_w_msg() {
 
 package_install() {
   # TODO: Expand this to include custom commands and not just pacman
-  echo "${2:-$1}" | { NAME=$(cat); run_w_msg "Installing $NAME..." pacman -Sy --noconfirm $1; }
+  echo "${2:-$1}" | { NAME=$(cat); run_w_msg "Installing $NAME..." yay -Sy --noconfirm $1; }
 }
 
 git_config() {
@@ -35,10 +35,31 @@ git_config() {
 
 # TODO: Prompt for network details, connect, and arch-chroot /mnt
 
+# Prepare for AUR helper build
+pacman -Sy base-devel
+pacman -Sy sudo
+# Setup wheel sudo
+sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+if [[ ! -s /etc/sudoers.new ]]; then
+  export EDITOR="cp /etc/sudoers.new"
+  visudo
+fi
+rm /etc/sudoers.new
+# Setup installer user
+id -u installer > /dev/null 2>&1 || { useradd -m -g users installer; passwd -d installer; }
+su installer << EOSU
+# Install yay
+git clone https://aur.archlinux.org/yay.git /tmp/aur
+cd /tmp/aur
+makepkg -si
+cd ~
+rm -rf /tmp/aur
+EOSU
+
+# Proceed with standard package installation
 package_install terminus-font
 setfont ter-132b
 package_install networkmanager
-nmtui
 package_install vim
 package_install openssh
 package_install git
