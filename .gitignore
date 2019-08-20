@@ -1,1 +1,4 @@
 notes/
+terminal/nvim/plugged/*
+terminal/nvim/.netrwhist
+terminal/nvim/colors

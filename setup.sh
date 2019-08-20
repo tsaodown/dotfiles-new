@@ -68,3 +68,10 @@ git_config user.name
 git_config user.email
 git_config hub.protocol https
 git_config credential.helper store
+package_install zsh
+chsh -s /usr/bin/zsh
+
+package_install neovim
+package_install antigen-git
+# Setup terminal
+./terminal/setup.sh
