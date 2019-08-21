@@ -5,6 +5,7 @@ GYST_PATH="${GYST_PATH:-/gyst}"
 
 package_install powerline-console-fonts
 setfont /usr/share/kbd/consolefonts/ter-powerline-v32n.psf.gz
+echo 'FONT=ter-powerline-v32n' > /etc/vconsole.conf
 package_install openssh
 package_install git
 package_install hub 'Github CLI'
