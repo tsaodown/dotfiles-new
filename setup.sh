@@ -57,8 +57,8 @@ rm -rf /tmp/aur
 EOSU
 
 # Proceed with standard package installation
-package_install terminus-font
-setfont ter-132b
+package_install powerline-console-fonts
+setfont /usr/share/kbd/consolefonts/ter-powerline-v32b.psf.gz
 package_install networkmanager
 package_install vim
 package_install openssh
