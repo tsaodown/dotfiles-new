@@ -1,5 +1,2 @@
 notes/
-terminal/nvim/plugged/*
-terminal/nvim/.netrwhist
-terminal/nvim/colors
-terminal/zshenv_global
+terminal/zsh/zshenv_global

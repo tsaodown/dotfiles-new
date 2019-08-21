@@ -8,22 +8,25 @@ GYST_PATH="${1:-/gyst}"
 # Prepare for AUR helper build
 pacman -Sy --noconfirm base-devel
 pacman -Sy --noconfirm sudo
-# Setup wheel sudo
-sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
-if [[ ! -s /etc/sudoers.new ]]; then
-  export EDITOR="cp /etc/sudoers.new"
-  visudo
-fi
-rm /etc/sudoers.new
-# Setup installer user
-id -u installer > /dev/null 2>&1 || { useradd -m -g wheel installer; passwd -d installer; }
 [ -d /tmp/yay ] && rm -rf /tmp/yay
 git clone https://aur.archlinux.org/yay.git /tmp/yay
 cd /tmp/yay
 chmod -R 777 /tmp/yay
+setup_installer
 sudo -u installer -H sh -c "makepkg -si --noconfirm"
 cd ~
 rm -rf /tmp/yay
+loop_env() {
+  for file in $1/*; do
+    if [[ -d $file && ( ! -a $file/.git || -d $file/.git ) ]]; then
+      if [ -x $file/env.sh ]; then
+        . $file/env.sh
+      fi
+      loop_env $file
+    fi
+  done
+}
+[ -a $GYST_PATH/zsh/zshenv_global ] && rm $GYST_PATH/zsh/zshenv_global
+loop_env $GYST_PATH
 loop_files $GYST_PATH
-userdel installer
-rm -rf /home/installer
+cleanup_installer

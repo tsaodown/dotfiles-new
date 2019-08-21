@@ -4,6 +4,30 @@ GYST_PATH=${GYST_PATH:-/gyst}
 
 set -eE -o functrace
 
+setup_installer() {
+  # Setup wheel sudo
+  sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+  if [[ ! -s /etc/sudoers.new ]]; then
+    export EDITOR="cp /etc/sudoers.new"
+    visudo
+  fi
+  rm /etc/sudoers.new
+  # Setup installer user
+  id -u installer > /dev/null 2>&1 || { useradd -m -g wheel installer; passwd -d installer; }
+}
+
+cleanup_installer() {
+  id -u installer > /dev/null 2>&1 && userdel installer
+  rm -rf /home/installer
+}
+
+add_env_var() {
+[ $# -ne 0 ] && export $1
+[ $# -ne 0 ] && [ -z $(grep -q "$1" $GYST_PATH/terminal/zsh/zshenv_global) ] && cat << EOF >> $GYST_PATH/terminal/zsh/zshenv_global
+export $1
+EOF
+}
+
 failure() {
   local lineno=$1
   local msg=$2
@@ -35,6 +59,7 @@ run_w_msg() {
 }
 
 package_install() {
+  id -u installer > /dev/null 2>&1 || setup_installer
   # TODO: Expand this to include custom commands and not just pacman
   run_w_msg "Installing ${2:-$1}..." 'sudo -u installer -H sh -c "yay -Sy --noconfirm $1"'
 }
@@ -46,7 +71,7 @@ git_config() {
 
 loop_files() {
   for file in $1/*; do
-    if [ -d $file ]; then
+    if [[ -d $file && ( ! -a $file/.git || -d $file/.git ) ]]; then
       if [ -x $file/setup.sh ]; then
         . $file/setup.sh
       fi

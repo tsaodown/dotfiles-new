@@ -1,4 +1,4 @@
-call plug#begin()
+call plug#begin('/etc/nvim/site/plugged')
 
 " Utilities
 Plug 'scrooloose/nerdtree'                " File explorer
