@@ -27,10 +27,8 @@ if [ -f ~/dotfiles/local_settings ] ; then
   source ~/dotfiles/local_settings
 fi
 
-SCRIPT_PATH=$(dirname $(realpath -L ~/.zshrc))
-
 # Source antigen for bundles
-source "$SCRIPT_PATH/antigen/antigen.zsh"
+source "$GYST_PATH/terminal/antigen/antigen.zsh"
 
 antigen use oh-my-zsh
 
