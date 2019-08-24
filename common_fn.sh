@@ -4,6 +4,13 @@ GYST_PATH=${GYST_PATH:-/gyst}
 
 set -eE -o functrace
 
+ln_replace() {
+  [[ -d $2 ]] && print_err "That's a directory."
+  [[ ! -d $(dirname $2) ]] && mkdir -p $(dirname $2)
+  [[ -a $2 && ! -L $2 ]] && rm $2
+  ln -s $1 $2
+}
+
 setup_installer() {
   # Setup wheel sudo
   sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
@@ -45,6 +52,10 @@ die() {
 get_input() {
   read -p $'\e[1;90m'"$1"$'\e[0m: ' TMP
   echo "$TMP"
+}
+
+print_err() {
+  printf "\e[1;31m$1\e[0m\n"
 }
 
 print_msg() {
